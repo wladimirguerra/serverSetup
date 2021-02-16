@@ -23,7 +23,7 @@ fi
 
 ENCRYPTED_PASSWORD="$(python3 -c "import crypt; print(crypt.crypt('${USER_PASSWORD}'))")"
 
-adduser -m -p "$ENCRYPTED_PASSWORD" "$USER_NAME" || exit 1
+useradd -m -p "$ENCRYPTED_PASSWORD" "$USER_NAME" || exit 1
 
 usermod -aG sudo "$USER_NAME" || exit 1
 

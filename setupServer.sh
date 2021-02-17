@@ -23,7 +23,11 @@ fi
 
 ENCRYPTED_PASSWORD="$(python3 -c "import crypt; print(crypt.crypt('${USER_PASSWORD}'))")"
 
-useradd -m -p "$ENCRYPTED_PASSWORD" "$USER_NAME" || exit 1
+if ! id "$1" >/dev/null 2>&1; then
+  echo "User doesn't exists. Creating user..."
+  useradd -m -p "$ENCRYPTED_PASSWORD" "$USER_NAME" || exit 1
+  echo "User created."
+fi
 
 usermod -aG sudo "$USER_NAME" || exit 1
 
@@ -33,7 +37,7 @@ ufw allow OpenSSH || exit 1
 echo "ufw Configured! You must enable it manually."
 
 echo "Making root .ssh folder"
-mkdir ~/.ssh || exit 1
+mkdir -p ~/.ssh || exit 1
 
 echo "Copying authorized_keys to .ssh root folder"
 cp ./pub-key ~/.ssh/authorized_keys || exit 1

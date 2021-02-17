@@ -51,30 +51,30 @@ echo "Making a backup copy to sshd_config.bak."
 cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
 
 echo "Reconfiguring sshd_config..."
-sed 's/#\?\(PermitRootLogin\s*\).*$/\1 no/' /etc/ssh/sshd_config > sshd_config_temp.txt
+sed 's/#\?\(PermitRootLogin\s*\).*$/\1 no/' /etc/ssh/sshd_config > .sshd_config_temp.txt
 
-if [ ! -f ./sshd_config_temp.txt ]; then
-  echo "Couldn't reconfigure sshd. 'sed' was unable to create sshd_config_temp.txt file."
+if [ ! -f ./.sshd_config_temp.txt ]; then
+  echo "Couldn't reconfigure sshd. 'sed' was unable to create .sshd_config_temp.txt file."
   exit 1
 fi
 
-sed -i 's/#\?\(MaxAuthTries\s*\).*$/\1 3/' ./sshd_config_temp.txt || exit 1
+sed -i 's/#\?\(MaxAuthTries\s*\).*$/\1 3/' ./.sshd_config_temp.txt || exit 1
 # LoginGraceTime
 # Lower values prevent certain denial-of-service attacks
-sed -i 's/#\?\(LoginGraceTime\s*\).*$/\1 20/' ./sshd_config_temp.txt || exit 1
-sed -i 's/#\?\(PasswordAuthentication\s*\).*$/\1 no/' ./sshd_config_temp.txt || exit 1
-sed -i 's/#\?\(PermitEmptyPasswords\s*\).*$/\1 no/' ./sshd_config_temp.txt || exit 1
-sed -i 's/#\?\(ChallengeResponseAuthentication\s*\).*$/\1 no/' ./sshd_config_temp.txt || exit 1
-sed -i 's/#\?\(GSSAPIAuthentication\s*\).*$/\1 no/' ./sshd_config_temp.txt || exit 1
-sed -i 's/#\?\(X11Forwarding\s*\).*$/\1 no/' ./sshd_config_temp.txt || exit 1
-#sed -i 's/#\?\(PermitUserEnvironment\s*\).*$/\1 no/' ./sshd_config_temp.txt || exit 1
-sed -i 's/#\?\(AllowAgentForwarding\s*\).*$/\1 no/' ./sshd_config_temp.txt || exit 1
-sed -i 's/#\?\(AllowTcpForwarding\s*\).*$/\1 no/' ./sshd_config_temp.txt || exit 1
-sed -i 's/#\?\(PermitTunnel\s*\).*$/\1 no/' ./sshd_config_temp.txt || exit 1
-sed -i 's/#\?\(DebianBanner\s*\).*$/\1 no/' ./sshd_config_temp.txt || exit 1
+sed -i 's/#\?\(LoginGraceTime\s*\).*$/\1 20/' ./.sshd_config_temp.txt || exit 1
+sed -i 's/#\?\(PasswordAuthentication\s*\).*$/\1 no/' ./.sshd_config_temp.txt || exit 1
+sed -i 's/#\?\(PermitEmptyPasswords\s*\).*$/\1 no/' ./.sshd_config_temp.txt || exit 1
+sed -i 's/#\?\(ChallengeResponseAuthentication\s*\).*$/\1 no/' ./.sshd_config_temp.txt || exit 1
+sed -i 's/#\?\(GSSAPIAuthentication\s*\).*$/\1 no/' ./.sshd_config_temp.txt || exit 1
+sed -i 's/#\?\(X11Forwarding\s*\).*$/\1 no/' ./.sshd_config_temp.txt || exit 1
+#sed -i 's/#\?\(PermitUserEnvironment\s*\).*$/\1 no/' ./.sshd_config_temp.txt || exit 1
+sed -i 's/#\?\(AllowAgentForwarding\s*\).*$/\1 no/' ./.sshd_config_temp.txt || exit 1
+sed -i 's/#\?\(AllowTcpForwarding\s*\).*$/\1 no/' ./.sshd_config_temp.txt || exit 1
+sed -i 's/#\?\(PermitTunnel\s*\).*$/\1 no/' ./.sshd_config_temp.txt || exit 1
+sed -i 's/#\?\(DebianBanner\s*\).*$/\1 no/' ./.sshd_config_temp.txt || exit 1
 
 echo "Overwriting sshd_config file"
-mv -f temp.txt /etc/ssh/sshd_config || exit 1
+mv -f .sshd_config_temp.txt /etc/ssh/sshd_config || (rm .sshd_config_temp.txt && exit 1)
 echo "Successfully reconfigured sshd"
 
 echo "Testing configuration"

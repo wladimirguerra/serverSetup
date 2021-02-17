@@ -138,7 +138,7 @@ apt-get --assume-yes install docker-ce docker-ce-cli containerd.io
 # https://docs.docker.com/engine/install/linux-postinstall/
 groupadd docker
 
-usermod -aG docker admin
+usermod -aG docker "$USER_NAME"
 
 chown docker:docker /dockerVolumes
 

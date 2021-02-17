@@ -39,8 +39,16 @@ mkdir -p ~/.ssh || exit 1
 echo "Copying authorized_keys to .ssh root folder"
 cp ./pub-key ~/.ssh/authorized_keys || exit 1
 
+echo "Setting up ssh files and folder correct permission for the root."
+chmod 700 ~/.ssh || exit 1
+chmod 600 ~/.ssh/authorized_keys || exit 1
+
 echo "Copying authorized_keys to $USER_NAME folder"
 rsync --archive --chown="$USER_NAME":"$USER_NAME" ~/.ssh /home/"$USER_NAME" || exit 1
+
+echo "Setting up ssh files and folder correct permission for the user $USER_NAME."
+chmod 700 /home/"$USER_NAME"/.ssh || exit 1
+chmod 600 /home/"$USER_NAME"/.ssh/authorized_keys || exit 1
 
 echo "Hardening sshd"
 echo "Making a backup copy to sshd_config.bak."
@@ -87,6 +95,76 @@ fi
 echo "Test Succeeded"
 
 echo "Reloading sshd"
-service sshd reload
+systemctl restart ssh
 echo "Reload Succeeded"
 
+echo "
+Installing Docker
+
+Setting up package config..."
+
+# See https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository
+# for further details
+
+apt-get update
+
+apt-get install \
+  apt-transport-https \
+  ca-certificates \
+  curl \
+  gnupg-agent \
+  software-properties-common
+
+# Add Docker’s official GPG key
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+echo "
+Docker GPG fingerprint should contain
+9DC8 5822 9FC7 DD38 854A  E2D8 8D81 803C 0EBF CD88
+
+installed fingerprint:"
+apt-key fingerprint 0EBFCD88
+
+add-apt-repository \
+  "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+
+echo "
+Installing...
+"
+apt-get update
+apt-get --assume-yes install docker-ce docker-ce-cli containerd.io
+
+# See
+# https://docs.docker.com/engine/install/linux-postinstall/
+groupadd docker
+
+usermod -aG docker admin
+
+chown docker:docker /dockerVolumes
+
+echo "
+Configuring Docker to start on boot...
+"
+
+systemctl enable docker
+
+echo "
+Installing Docker-Composer
+"
+# See
+# https://docs.docker.com/compose/install/
+curl -L "https://github.com/docker/compose/releases/download/1.26.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
+ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+
+# Command line completion for docker-composer
+# See
+# https://docs.docker.com/compose/completion/
+curl -L https://raw.githubusercontent.com/docker/compose/1.26.1/contrib/completion/bash/docker-compose -o /etc/bash_completion.d/docker-compose
+
+docker-compose --version && echo "docker-composer installed successfully."
+
+echo "
+Installing htpasswd...
+"
+apt-get install apache2-utils

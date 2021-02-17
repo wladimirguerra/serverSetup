@@ -1,7 +1,6 @@
 #!/bin/dash
 
 USER_NAME="$1"
-USER_PASSWORD="$2"
 # This script aims Ubuntu 18.04
 #
 # It should be run as a root user.
@@ -21,11 +20,9 @@ fi
 # This step was written following the tutorial:
 # https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-18-04
 
-ENCRYPTED_PASSWORD="$(python3 -c "import crypt; print(crypt.crypt('${USER_PASSWORD}'))")"
-
 if ! id "$1" >/dev/null 2>&1; then
   echo "User doesn't exists. Creating user..."
-  useradd -m -p "$ENCRYPTED_PASSWORD" "$USER_NAME" || exit 1
+  adduser "$USER_NAME" || exit 1
   echo "User created."
 fi
 
